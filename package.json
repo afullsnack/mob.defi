@@ -1,5 +1,5 @@
 {
-  "name": "create-t3-turbo",
+  "name": "mob_defi_monorepo",
   "private": true,
   "engines": {
     "node": ">=18.0.0"
@@ -16,7 +16,7 @@
     "lint": "turbo lint && manypkg check",
     "lint:fix": "turbo lint:fix && manypkg fix",
     "type-check": "turbo type-check",
-    "with-env": "dotenv -e .env --"
+    "with-env": "dotenv -e .env.dev --"
   },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^3.7.1",
