@@ -1,5 +1,5 @@
 packages:
-  - apps/p2p-mobile
+  # - apps/p2p-mobile
   - apps/p2p-web
   - packages/api
   - packages/auth
