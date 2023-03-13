@@ -1,5 +1,5 @@
 {
-  "name": "mob_defi_monorepo",
+  "name": "@myrelayer",
   "private": true,
   "engines": {
     "node": ">=18.0.0"
@@ -11,12 +11,12 @@
     "clean:workspaces": "turbo clean",
     "db:generate": "pnpm with-env turbo db:generate",
     "db:push": "pnpm with-env turbo db:push db:generate",
-    "dev": "pnpm with-env turbo dev --parallel",
+    "dev": "pnpm with-env turbo dev --no-daemon --parallel",
     "format": "prettier --write \"**/*.{js,cjs,mjs,ts,tsx,md,json}\" --ignore-path .gitignore",
     "lint": "turbo lint && manypkg check",
     "lint:fix": "turbo lint:fix && manypkg fix",
     "type-check": "turbo type-check",
-    "with-env": "dotenv -e .env.dev --"
+    "with-env": "dotenv -e .env.local --"
   },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^3.7.1",
