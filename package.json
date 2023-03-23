@@ -16,7 +16,8 @@
     "lint": "turbo lint && manypkg check",
     "lint:fix": "turbo lint:fix && manypkg fix",
     "type-check": "turbo type-check",
-    "with-env": "dotenv -e .env.local --"
+    "with-env": "dotenv -e .env.local --",
+    "dev:p2p-web": "pnpm dev --filter @myrelayer/p2p-web"
   },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^3.7.1",

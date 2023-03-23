@@ -3,19 +3,16 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "./src/*"
-      ]
-    },
-    "strictNullChecks": true
+      "@/*": ["./*"]
+    }
   },
   "exclude": [],
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    ".next/types/**/*.ts"
+    "postcss.config.cjs",
+    "tailwind.config.cjs"
   ]
 }

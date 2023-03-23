@@ -1,86 +1,154 @@
-import { useState } from "react";
+import * as React from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { signIn, signOut } from "next-auth/react";
 
-import { api, type RouterOutputs } from "~/utils/api";
+import { cn } from "@myrelayer/ui/lib/utils";
+// import { Icons } from "@/components/icons"
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@myrelayer/ui/nav";
 
-const PostCard: React.FC<{
-  post: RouterOutputs["post"]["all"][number];
-  onPostDelete?: () => void;
-}> = ({ post, onPostDelete }) => {
+import { api } from "~/utils/api";
+
+("use client");
+
+const components: { title: string; href: string; description: string }[] = [
+  {
+    title: "Alert Dialog",
+    href: "/docs/primitives/alert-dialog",
+    description:
+      "A modal dialog that interrupts the user with important content and expects a response.",
+  },
+  {
+    title: "Hover Card",
+    href: "/docs/primitives/hover-card",
+    description:
+      "For sighted users to preview content available behind a link.",
+  },
+  {
+    title: "Progress",
+    href: "/docs/primitives/progress",
+    description:
+      "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
+  },
+  {
+    title: "Scroll-area",
+    href: "/docs/primitives/scroll-area",
+    description: "Visually or semantically separates content.",
+  },
+  {
+    title: "Tabs",
+    href: "/docs/primitives/tabs",
+    description:
+      "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
+  },
+  {
+    title: "Tooltip",
+    href: "/docs/primitives/tooltip",
+    description:
+      "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
+  },
+];
+
+export function NavigationMenuDemo() {
   return (
-    <div className="flex flex-row rounded-lg bg-white/10 p-4 transition-all hover:scale-[101%]">
-      <div className="flex-grow">
-        <h2 className="text-2xl font-bold text-pink-400">{post.title}</h2>
-        <p className="mt-2 text-sm">{post.content}</p>
-      </div>
-      <div>
-        <span
-          className="cursor-pointer text-sm font-bold uppercase text-pink-400"
-          onClick={onPostDelete}
+    <NavigationMenu>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+              <li className="row-span-3">
+                <NavigationMenuLink asChild>
+                  <a
+                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-rose-500 to-indigo-700 p-6 no-underline outline-none focus:shadow-md"
+                    href="/"
+                  >
+                    <span className="h-6 w-6 text-white" />
+                    <div className="mt-4 mb-2 text-lg font-medium text-white">
+                      shadcn/ui
+                    </div>
+                    <p className="text-sm leading-tight text-white/90">
+                      Beautifully designed components built with Radix UI and
+                      Tailwind CSS.
+                    </p>
+                  </a>
+                </NavigationMenuLink>
+              </li>
+              <ListItem href="/docs" title="Introduction">
+                Re-usable components built using Radix UI and Tailwind CSS.
+              </ListItem>
+              <ListItem href="/docs/installation" title="Installation">
+                How to install dependencies and structure your app.
+              </ListItem>
+              <ListItem href="/docs/primitives/typography" title="Typography">
+                Styles for headings, paragraphs, lists...etc
+              </ListItem>
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Components</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+              {components.map((component) => (
+                <ListItem
+                  key={component.title}
+                  title={component.title}
+                  href={component.href}
+                >
+                  {component.description}
+                </ListItem>
+              ))}
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <Link href="/docs" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Documentation
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-slate-700 dark:focus:bg-slate-700",
+            className,
+          )}
+          {...props}
         >
-          Delete
-        </span>
-      </div>
-    </div>
+          <div className="text-sm font-medium leading-none text-slate-700">
+            {title}
+          </div>
+          <p className="line-clamp-2 text-sm leading-snug text-slate-500 dark:text-slate-400">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
   );
-};
-
-const CreatePostForm: React.FC = () => {
-  const utils = api.useContext();
-
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
-  const { mutate, error } = api.post.create.useMutation({
-    async onSuccess() {
-      setTitle("");
-      setContent("");
-      await utils.post.all.invalidate();
-    },
-  });
-
-  return (
-    <div className="flex w-full max-w-2xl flex-col p-4">
-      <input
-        className="mb-2 rounded bg-white/10 p-2 text-white"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Title"
-      />
-      {error?.data?.zodError?.fieldErrors.title && (
-        <span className="mb-2 text-red-500">
-          {error.data.zodError.fieldErrors.title}
-        </span>
-      )}
-      <Link href="/yoo">Hello</Link>
-      <input
-        className="mb-2 rounded bg-white/10 p-2 text-white"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Content"
-      />
-      {error?.data?.zodError?.fieldErrors.content && (
-        <span className="mb-2 text-red-500">
-          {error.data.zodError.fieldErrors.content}
-        </span>
-      )}
-      <button
-        className="rounded bg-pink-400 p-2 font-bold"
-        onClick={() => {
-          mutate({
-            title,
-            content,
-          });
-        }}
-      >
-        Create
-      </button>
-    </div>
-  );
-};
+});
+ListItem.displayName = "ListItem";
 
 const Home: NextPage = () => {
   const postQuery = api.post.all.useQuery();
@@ -89,45 +157,45 @@ const Home: NextPage = () => {
     onSettled: () => postQuery.refetch(),
   });
 
+  React.useEffect(() => {
+    const userTheme = localStorage.getItem("theme");
+    const systemTheme = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+    // Initial theme check
+    const themeCheck = () => {
+      if (userTheme === "dark" || (!userTheme && systemTheme)) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+        return "dark";
+      } else {
+        localStorage.setItem("theme", "dark");
+        document.documentElement.classList.add("dark");
+        return "dark";
+      }
+    };
+    themeCheck();
+  }, []);
+
   return (
     <>
       <Head>
         <title>myrelayer | Peer-to-peer exchange</title>
-        <meta name="description" content="Peer-to-peer exchange of crypto and fx" />
+        <meta
+          name="description"
+          content="Peer-to-peer exchange of crypto and fx"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex h-screen flex-col items-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container mt-12 flex flex-col items-center justify-center gap-4 px-4 py-8">
-          <h1 className="animate-in slide-in-from-bottom fade-in-25 duration-700 ease-in-out text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-pink-400">T3</span> Turbo
-          </h1>
-          <AuthShowcase />
-
-          <CreatePostForm />
-
-          {postQuery.data ? (
-            <div className="w-full max-w-2xl">
-              {postQuery.data?.length === 0 ? (
-                <span>There are no posts!</span>
-              ) : (
-                <div className="flex h-[40vh] justify-center overflow-y-scroll px-4 text-2xl">
-                  <div className="flex w-full flex-col gap-4">
-                    {postQuery.data?.map((p: any) => {
-                      return (
-                        <PostCard
-                          key={p.id}
-                          post={p}
-                          onPostDelete={() => deletePostMutation.mutate(p.id)}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+      <main className="flex h-screen flex-col items-center bg-white p-2 text-white">
+        <div className="grid h-full w-full grid-cols-5 items-center justify-center overflow-clip rounded-md">
+          <div className="col-span-3 flex h-full flex-col bg-gray-300/40 p-2 dark:bg-slate-800">
+            <div className="h-16 w-full rounded bg-purple-900 p-4 text-white">
+              <NavigationMenuDemo />
             </div>
-          ) : (
-            <p>Loading...</p>
-          )}
+            <h1 className="font-sans text-sm">Hello</h1>
+          </div>
+          <div className="col-span-2 flex h-full bg-gray-500/30"></div>
         </div>
       </main>
     </>
@@ -135,29 +203,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
-const AuthShowcase: React.FC = () => {
-  const { data: session } = api.auth.getSession.useQuery();
-
-  const { data: secretMessage } = api.auth.getSecretMessage.useQuery(
-    undefined, // no input
-    { enabled: !!session?.user },
-  );
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      {session?.user && (
-        <p className="text-center text-2xl text-white">
-          {session && <span>Logged in as {session?.user?.name}</span>}
-          {secretMessage && <span> - {secretMessage}</span>}
-        </p>
-      )}
-      <button
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-        onClick={session ? () => void signOut() : () => void signIn()}
-      >
-        {session ? "Sign out" : "Sign in"}
-      </button>
-    </div>
-  );
-};
